@@ -29,9 +29,46 @@ restaurantRouter.post('/', adminMiddleware, async (req, res) => {
 restaurantRouter.get('/', async (req, res) => {
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 
-  Restaurant.find()
-    .then(restaurants => res.json(restaurants))
-    .catch(err => res.status(500).json({ error: err.message }));
+  
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const sortBy = req.query.sortBy as string; 
+  const sortOrder = req.query.sortOrder as string || 'asc'; 
+
+  
+  const skip = (page - 1) * limit;
+
+  try {
+    let query = Restaurant.find();
+
+    
+    if (sortBy === 'name') {
+      query = query.sort({ name: sortOrder === 'desc' ? -1 : 1 });
+    } else if (sortBy === 'address') {
+      query = query.sort({ address: sortOrder === 'desc' ? -1 : 1 });
+    }
+
+    
+    query = query.skip(skip).limit(limit);
+
+    const restaurants = await query.exec();
+    const total = await Restaurant.countDocuments();
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      restaurants,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 restaurantRouter.get('/:id', async (req, res) => {

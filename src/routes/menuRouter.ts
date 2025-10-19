@@ -30,10 +30,88 @@ menuRouter.post('/', adminMiddleware, async (req, res) => {
 menuRouter.get('/', async (req, res) => {
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 
-  MenuItem.find()
-    .populate('restaurant_id', 'name')
-    .then(menuItems => res.json(menuItems))
-    .catch(err => res.status(500).json({ error: err.message }));
+  
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const sortBy = req.query.sortBy as string; 
+  const sortOrder = req.query.sortOrder as string || 'asc'; 
+
+  
+  const skip = (page - 1) * limit;
+
+  try {
+    let query = MenuItem.find().populate('restaurant_id', 'name address');
+
+    
+    if (sortBy === 'name') {
+      query = query.sort({ name: sortOrder === 'desc' ? -1 : 1 });
+    } else if (sortBy === 'price') {
+      query = query.sort({ price: sortOrder === 'desc' ? -1 : 1 });
+    } else if (sortBy === 'category') {
+      query = query.sort({ category: sortOrder === 'desc' ? -1 : 1 });
+    } else if (sortBy === 'address') {
+      
+      const sortDirection = sortOrder === 'desc' ? -1 : 1;
+      const menuItems = await MenuItem.aggregate([
+        {
+          $lookup: {
+            from: 'restaurants',
+            localField: 'restaurant_id',
+            foreignField: '_id',
+            as: 'restaurant_id'
+          }
+        },
+        {
+          $unwind: '$restaurant_id'
+        },
+        {
+          $sort: { 'restaurant_id.address': sortDirection }
+        },
+        {
+          $skip: skip
+        },
+        {
+          $limit: limit
+        }
+      ]);
+
+      const total = await MenuItem.countDocuments();
+      const totalPages = Math.ceil(total / limit);
+
+      return res.json({
+        menuItems,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: limit,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1
+        }
+      });
+    }
+
+    
+    query = query.skip(skip).limit(limit);
+
+    const menuItems = await query.exec();
+    const total = await MenuItem.countDocuments();
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      menuItems,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 menuRouter.get('/:id', async (req, res) => {
@@ -55,10 +133,48 @@ menuRouter.get('/restaurant/:restaurantId', async (req, res) => {
   const restaurantId = req.params.restaurantId;
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 
-  MenuItem.find({ restaurant_id: restaurantId })
-    .populate('restaurant_id', 'name')
-    .then(menuItems => res.json(menuItems))
-    .catch(err => res.status(500).json({ error: err.message }));
+  
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const sortBy = req.query.sortBy as string; 
+  const sortOrder = req.query.sortOrder as string || 'asc'; 
+
+  
+  const skip = (page - 1) * limit;
+
+  try {
+    let query = MenuItem.find({ restaurant_id: restaurantId }).populate('restaurant_id', 'name address');
+
+    
+    if (sortBy === 'name') {
+      query = query.sort({ name: sortOrder === 'desc' ? -1 : 1 });
+    } else if (sortBy === 'price') {
+      query = query.sort({ price: sortOrder === 'desc' ? -1 : 1 });
+    } else if (sortBy === 'category') {
+      query = query.sort({ category: sortOrder === 'desc' ? -1 : 1 });
+    }
+
+    
+    query = query.skip(skip).limit(limit);
+
+    const menuItems = await query.exec();
+    const total = await MenuItem.countDocuments({ restaurant_id: restaurantId });
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      menuItems,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 menuRouter.put('/:id', adminMiddleware, async (req, res) => {
