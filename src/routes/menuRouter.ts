@@ -3,6 +3,12 @@ import { Router } from 'express';
 
 const menuRouter = Router();
 
+interface MenuItem {
+  id: number;
+  name: string;
+  price: number;
+}
+
 menuRouter.get('/', (req, res) => {
   res.send('User list');
 });
