@@ -2,10 +2,18 @@
 import bcrypt from 'bcrypt';
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
-import adminMiddleware, { AuthenticatedRequest } from 'middlewares/adminMiddleware';
-import authMiddleware from 'middlewares/authMiddleware';
-import userAuthorizationMiddleware from 'middlewares/userAuthorizationMiddleware';
 import mongoose, { connect, Schema } from 'mongoose';
+import adminMiddleware, { AuthenticatedRequest } from '../middlewares/adminMiddleware';
+import authMiddleware from '../middlewares/authMiddleware';
+import userAuthorizationMiddleware from '../middlewares/userAuthorizationMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import {
+    mongoIdSchema,
+    paginationSchema,
+    userLoginSchema,
+    userRegistrationSchema,
+    userUpdateSchema
+} from '../validation/userValidation';
 
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
@@ -20,7 +28,7 @@ const User = mongoose.model('User', userSchema);
 
 const userRouter = Router();
 
-userRouter.post('/', async (req, res) => {
+userRouter.post('/', validate({ body: userRegistrationSchema }), async (req, res) => {
     const { email, username, password, role } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
 
@@ -46,7 +54,7 @@ userRouter.post('/', async (req, res) => {
     }
 });
 
-userRouter.post('/login', async (req, res) => {
+userRouter.post('/login', validate({ body: userLoginSchema }), async (req, res) => {
     const { email, password } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
 
@@ -78,7 +86,7 @@ userRouter.post('/login', async (req, res) => {
     }
 });
 
-userRouter.get('/', adminMiddleware, async (req, res) => {
+userRouter.get('/', adminMiddleware, validate({ query: paginationSchema }), async (req, res) => {
     await connect('mongodb://127.0.0.1:27017/foodexpress');
 
     try {
@@ -89,7 +97,7 @@ userRouter.get('/', adminMiddleware, async (req, res) => {
     }
 });
 
-userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, async (req, res) => {
+userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema }), async (req, res) => {
     const userId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
 
@@ -104,7 +112,7 @@ userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, async (req, 
     }
 });
 
-userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, async (req, res) => {
+userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema, body: userUpdateSchema }), async (req, res) => {
     const userId = req.params.id;
     const { email, username, password, role } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
@@ -134,7 +142,7 @@ userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, async (req, 
     }
 });
 
-userRouter.delete('/:id', authMiddleware, userAuthorizationMiddleware, async (req, res) => {
+userRouter.delete('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema }), async (req, res) => {
     const userId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
 

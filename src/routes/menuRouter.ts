@@ -2,6 +2,14 @@
 import { Router } from 'express';
 import mongoose, { connect, Schema } from 'mongoose';
 import adminMiddleware from '../middlewares/adminMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import {
+  menuItemCreationSchema,
+  menuItemIdSchema,
+  menuItemUpdateSchema,
+  menuQuerySchema,
+  menuRestaurantIdSchema
+} from '../validation/menuValidation';
 
 const menuItemSchema = new Schema({
   restaurant_id: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
@@ -17,7 +25,7 @@ const MenuItem = mongoose.model('MenuItem', menuItemSchema);
 
 const menuRouter = Router();
 
-menuRouter.post('/', adminMiddleware, async (req, res) => {
+menuRouter.post('/', adminMiddleware, validate({ body: menuItemCreationSchema }), async (req, res) => {
   const { restaurant_id, name, description, price, category } = req.body;
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 
@@ -27,7 +35,7 @@ menuRouter.post('/', adminMiddleware, async (req, res) => {
     .catch(err => res.status(400).json({ error: err.message }));
 });
 
-menuRouter.get('/', async (req, res) => {
+menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 
   
@@ -114,7 +122,7 @@ menuRouter.get('/', async (req, res) => {
   }
 });
 
-menuRouter.get('/:id', async (req, res) => {
+menuRouter.get('/:id', validate({ params: menuItemIdSchema }), async (req, res) => {
   const menuItemId = req.params.id;
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 
@@ -129,7 +137,7 @@ menuRouter.get('/:id', async (req, res) => {
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
-menuRouter.get('/restaurant/:restaurantId', async (req, res) => {
+menuRouter.get('/restaurant/:restaurantId', validate({ params: menuRestaurantIdSchema, query: menuQuerySchema }), async (req, res) => {
   const restaurantId = req.params.restaurantId;
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 
@@ -177,7 +185,7 @@ menuRouter.get('/restaurant/:restaurantId', async (req, res) => {
   }
 });
 
-menuRouter.put('/:id', adminMiddleware, async (req, res) => {
+menuRouter.put('/:id', adminMiddleware, validate({ params: menuItemIdSchema, body: menuItemUpdateSchema }), async (req, res) => {
   const menuItemId = req.params.id;
   const { restaurant_id, name, description, price, category } = req.body;
   await connect('mongodb://127.0.0.1:27017/foodexpress');
@@ -193,7 +201,7 @@ menuRouter.put('/:id', adminMiddleware, async (req, res) => {
     .catch(err => res.status(400).json({ error: err.message }));
 });
 
-menuRouter.delete('/:id', adminMiddleware, async (req, res) => {
+menuRouter.delete('/:id', adminMiddleware, validate({ params: menuItemIdSchema }), async (req, res) => {
   const menuItemId = req.params.id;
   await connect('mongodb://127.0.0.1:27017/foodexpress');
 

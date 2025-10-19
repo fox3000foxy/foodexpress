@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import mongoose, { connect, Schema } from 'mongoose';
 import adminMiddleware from '../middlewares/adminMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import { restaurantCreationSchema, restaurantIdSchema, restaurantQuerySchema, restaurantUpdateSchema } from '../validation/restaurantValidation';
 const restaurantSchema = new Schema({
     name: { type: String, required: true },
     address: { type: String, required: true },
@@ -11,7 +13,7 @@ const restaurantSchema = new Schema({
 });
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
 const restaurantRouter = Router();
-restaurantRouter.post('/', adminMiddleware, async (req, res) => {
+restaurantRouter.post('/', adminMiddleware, validate({ body: restaurantCreationSchema }), async (req, res) => {
     const { name, address, phone, opening_hours } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     const newRestaurant = new Restaurant({ name, address, phone, opening_hours });
@@ -19,7 +21,7 @@ restaurantRouter.post('/', adminMiddleware, async (req, res) => {
         .then(restaurant => res.status(201).json(restaurant))
         .catch(err => res.status(400).json({ error: err.message }));
 });
-restaurantRouter.get('/', async (req, res) => {
+restaurantRouter.get('/', validate({ query: restaurantQuerySchema }), async (req, res) => {
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -54,7 +56,7 @@ restaurantRouter.get('/', async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-restaurantRouter.get('/:id', async (req, res) => {
+restaurantRouter.get('/:id', validate({ params: restaurantIdSchema }), async (req, res) => {
     const restaurantId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     Restaurant.findById(restaurantId)
@@ -66,7 +68,7 @@ restaurantRouter.get('/:id', async (req, res) => {
     })
         .catch(err => res.status(500).json({ error: err.message }));
 });
-restaurantRouter.put('/:id', adminMiddleware, async (req, res) => {
+restaurantRouter.put('/:id', adminMiddleware, validate({ params: restaurantIdSchema, body: restaurantUpdateSchema }), async (req, res) => {
     const restaurantId = req.params.id;
     const { name, address, phone, opening_hours } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
@@ -79,7 +81,7 @@ restaurantRouter.put('/:id', adminMiddleware, async (req, res) => {
     })
         .catch(err => res.status(400).json({ error: err.message }));
 });
-restaurantRouter.delete('/:id', adminMiddleware, async (req, res) => {
+restaurantRouter.delete('/:id', adminMiddleware, validate({ params: restaurantIdSchema }), async (req, res) => {
     const restaurantId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     Restaurant.findByIdAndDelete(restaurantId)
