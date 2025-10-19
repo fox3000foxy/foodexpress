@@ -1,4 +1,7 @@
+import { config } from 'dotenv';
 import express from 'express';
+
+config();
 const app = express();
 const port = 3000;
 
