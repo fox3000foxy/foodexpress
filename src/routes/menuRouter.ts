@@ -1,7 +1,7 @@
 
 import { Router } from 'express';
-import adminMiddleware from 'middlewares/adminMiddleware';
 import mongoose, { connect, Schema } from 'mongoose';
+import adminMiddleware from '../middlewares/adminMiddleware';
 
 const menuItemSchema = new Schema({
   restaurant_id: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },

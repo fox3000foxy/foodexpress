@@ -1,4 +1,9 @@
+import bcrypt from 'bcrypt';
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
+import adminMiddleware from 'middlewares/adminMiddleware';
+import authMiddleware from 'middlewares/authMiddleware';
+import userAuthorizationMiddleware from 'middlewares/userAuthorizationMiddleware';
 import mongoose, { connect, Schema } from 'mongoose';
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
@@ -13,52 +18,103 @@ const userRouter = Router();
 userRouter.post('/', async (req, res) => {
     const { email, username, password, role } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
-    const newUser = new User({ email, username, password, role });
-    newUser.save()
-        .then(user => res.status(201).json(user))
-        .catch(err => res.status(400).json({ error: err.message }));
+    try {
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        const newUser = new User({
+            email,
+            username,
+            password: hashedPassword,
+            role: role || 'user'
+        });
+        const savedUser = await newUser.save();
+        const { password: _, ...userResponse } = savedUser.toObject();
+        res.status(201).json(userResponse);
+    }
+    catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 });
-userRouter.get('/', async (req, res) => {
+userRouter.post('/login', async (req, res) => {
+    const { email, password } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
-    User.find()
-        .then(users => res.json(users))
-        .catch(err => res.status(500).json({ error: err.message }));
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        const token = jwt.sign({ userId: user._id.toString(), role: user.role }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        const { password: _, ...userResponse } = user.toObject();
+        res.json({ user: userResponse, token });
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
-userRouter.get('/:id', async (req, res) => {
+userRouter.get('/', adminMiddleware, async (req, res) => {
+    await connect('mongodb://127.0.0.1:27017/foodexpress');
+    try {
+        const users = await User.find().select('-password');
+        res.json(users);
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, async (req, res) => {
     const userId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
-    User.findById(userId)
-        .then(user => {
+    try {
+        const user = await User.findById(userId).select('-password');
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
         res.json(user);
-    })
-        .catch(err => res.status(500).json({ error: err.message }));
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
-userRouter.put('/:id', async (req, res) => {
+userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, async (req, res) => {
     const userId = req.params.id;
     const { email, username, password, role } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
-    User.findByIdAndUpdate(userId, { email, username, password, role }, { new: true })
-        .then(user => {
+    try {
+        const updateData = { email, username };
+        if (password) {
+            const saltRounds = 10;
+            updateData.password = await bcrypt.hash(password, saltRounds);
+        }
+        const requestingUser = req;
+        if (requestingUser.user?.role === 'admin' && role !== undefined) {
+            updateData.role = role;
+        }
+        const user = await User.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
         res.json(user);
-    })
-        .catch(err => res.status(400).json({ error: err.message }));
+    }
+    catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 });
-userRouter.delete('/:id', async (req, res) => {
+userRouter.delete('/:id', authMiddleware, userAuthorizationMiddleware, async (req, res) => {
     const userId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
-    User.findByIdAndDelete(userId)
-        .then(user => {
+    try {
+        const user = await User.findByIdAndDelete(userId);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
         res.json({ message: 'User deleted successfully' });
-    })
-        .catch(err => res.status(500).json({ error: err.message }));
+    }
+    catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 export default userRouter;

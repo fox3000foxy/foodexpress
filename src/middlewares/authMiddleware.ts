@@ -25,3 +25,4 @@ export default async function authMiddleware(req: AuthenticatedRequest, res: Res
         res.status(401).json({ error: 'Invalid token' });
     }
 }
+
