@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import mongoose, { connect, Schema } from 'mongoose';
-import adminMiddleware from '../middlewares/adminMiddleware';
-import { validate } from '../middlewares/validationMiddleware';
-import { menuItemCreationSchema, menuItemUpdateSchema, menuItemIdSchema, menuRestaurantIdSchema, menuQuerySchema } from '../validation/menuValidation';
+import adminMiddleware from '../middlewares/adminMiddleware.js';
+import { validate } from '../middlewares/validationMiddleware.js';
+import { menuItemCreationSchema, menuItemUpdateSchema, menuItemIdSchema, menuRestaurantIdSchema, menuQuerySchema } from '../validation/menuValidation.js';
 const menuItemSchema = new Schema({
     restaurant_id: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
     name: { type: String, required: true },

@@ -2,11 +2,11 @@ import bcrypt from 'bcrypt';
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import mongoose, { connect, Schema } from 'mongoose';
-import adminMiddleware from '../middlewares/adminMiddleware';
-import authMiddleware from '../middlewares/authMiddleware';
-import userAuthorizationMiddleware from '../middlewares/userAuthorizationMiddleware';
-import { validate } from '../middlewares/validationMiddleware';
-import { mongoIdSchema, paginationSchema, userLoginSchema, userRegistrationSchema, userUpdateSchema } from '../validation/userValidation';
+import adminMiddleware from '../middlewares/adminMiddleware.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import userAuthorizationMiddleware from '../middlewares/userAuthorizationMiddleware.js';
+import { validate } from '../middlewares/validationMiddleware.js';
+import { mongoIdSchema, paginationSchema, userLoginSchema, userRegistrationSchema, userUpdateSchema } from '../validation/userValidation.js';
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true },
@@ -57,7 +57,7 @@ userRouter.post('/login', validate({ body: userLoginSchema }), async (req, res) 
         res.status(500).json({ error: err.message });
     }
 });
-userRouter.get('/', adminMiddleware, validate({ query: paginationSchema }), async (req, res) => {
+userRouter.get('/', validate({ query: paginationSchema }), async (req, res) => {
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     try {
         const users = await User.find().select('-password');
