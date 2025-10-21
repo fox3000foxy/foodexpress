@@ -19,7 +19,7 @@ const User = mongoose.model('User', userSchema);
 const userRouter = Router();
 userRouter.post('/', validate({ body: userRegistrationSchema }), async (req, res) => {
     const { email, username, password, role } = req.body;
-    await connect('mongodb://127.0.0.1:27017/foodexpress');
+    await connect('mongodb://localhost/foodexpress');
     try {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -39,7 +39,7 @@ userRouter.post('/', validate({ body: userRegistrationSchema }), async (req, res
 });
 userRouter.post('/login', validate({ body: userLoginSchema }), async (req, res) => {
     const { email, password } = req.body;
-    await connect('mongodb://127.0.0.1:27017/foodexpress');
+    await connect('mongodb://localhost/foodexpress');
     try {
         const user = await User.findOne({ email });
         if (!user) {
@@ -58,7 +58,7 @@ userRouter.post('/login', validate({ body: userLoginSchema }), async (req, res) 
     }
 });
 userRouter.get('/', validate({ query: paginationSchema }), async (req, res) => {
-    await connect('mongodb://127.0.0.1:27017/foodexpress');
+    await connect('mongodb://localhost/foodexpress');
     try {
         const users = await User.find().select('-password');
         res.json(users);
@@ -69,7 +69,7 @@ userRouter.get('/', validate({ query: paginationSchema }), async (req, res) => {
 });
 userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema }), async (req, res) => {
     const userId = req.params.id;
-    await connect('mongodb://127.0.0.1:27017/foodexpress');
+    await connect('mongodb://localhost/foodexpress');
     try {
         const user = await User.findById(userId).select('-password');
         if (!user) {
@@ -84,7 +84,7 @@ userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, validate({ p
 userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema, body: userUpdateSchema }), async (req, res) => {
     const userId = req.params.id;
     const { email, username, password, role } = req.body;
-    await connect('mongodb://127.0.0.1:27017/foodexpress');
+    await connect('mongodb://localhost/foodexpress');
     try {
         const updateData = { email, username };
         if (password) {
@@ -107,7 +107,7 @@ userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, validate({ p
 });
 userRouter.delete('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema }), async (req, res) => {
     const userId = req.params.id;
-    await connect('mongodb://127.0.0.1:27017/foodexpress');
+    await connect('mongodb://localhost/foodexpress');
     try {
         const user = await User.findByIdAndDelete(userId);
         if (!user) {
