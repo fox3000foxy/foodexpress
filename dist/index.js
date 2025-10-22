@@ -1,6 +1,10 @@
 import { config } from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
+import fs from 'fs';
+import path from 'path';
+import swaggerAutogenDefault from 'swagger-autogen';
+import swaggerUi from 'swagger-ui-express';
 config();
 const app = express();
 const port = 3000;
@@ -16,8 +20,68 @@ app.use('/menus', menuRouter);
 // Remplacement : connecter une seule fois avant de démarrer le serveur
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost/foodexpress';
 mongoose.connect(mongoUri)
-	.then(() => {
+	.then(async () => {
 		console.log('Connected to MongoDB:', mongoUri);
+
+		// --- nouveau : génération swagger ---
+		try {
+			const swaggerAutogen = (swaggerAutogenDefault && typeof swaggerAutogenDefault === 'function')
+				? swaggerAutogenDefault()
+				: (swaggerAutogenDefault.default ? swaggerAutogenDefault.default() : null);
+
+			const output = path.resolve(process.cwd(), 'swagger_output.json');
+			const endpointsFiles = [
+				path.resolve(process.cwd(), 'index.js'),
+				path.resolve(process.cwd(), 'routes', 'userRouter.js'),
+				path.resolve(process.cwd(), 'routes', 'restaurantRouter.js'),
+				path.resolve(process.cwd(), 'routes', 'menuRouter.js'),
+				// ajouter les middlewares pour que swagger-autogen collecte leurs commentaires
+				path.resolve(process.cwd(), 'middlewares', 'authMiddleware.js'),
+				path.resolve(process.cwd(), 'middlewares', 'adminMiddleware.js'),
+				path.resolve(process.cwd(), 'middlewares', 'validationMiddleware.js')
+			];
+
+			const doc = {
+				info: {
+					title: 'API FoodExpress',
+					description: 'Documentation auto-générée'
+				},
+				host: `localhost:${process.env.PORT || 3000}`,
+				schemes: ['http'],
+				// sécurité : header Authorization Bearer
+				securityDefinitions: {
+					bearerAuth: {
+						type: 'apiKey',
+						name: 'Authorization',
+						in: 'header',
+						description: "Utilisez 'Bearer <token>'"
+					}
+				},
+				// appliquer la sécurité par défaut (peut être surchargée dans les routes)
+				security: [{ bearerAuth: [] }]
+			};
+
+			// Générer si le fichier n'existe pas ou générer à chaque démarrage (ici on regen à chaque démarrage)
+			if (swaggerAutogen) {
+				await swaggerAutogen(output, endpointsFiles, doc);
+				console.log('Swagger généré →', output);
+			} else {
+				console.warn('swagger-autogen non initialisé correctement.');
+			}
+
+			// Monter swagger-ui
+			try {
+				const swaggerDocument = JSON.parse(fs.readFileSync(output, 'utf8'));
+				app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+				console.log('Swagger UI disponible sur /api-doc');
+			} catch (e) {
+				console.warn('Impossible de charger swagger_output.json pour swagger-ui:', e.message);
+			}
+		} catch (e) {
+			console.warn('Erreur lors de la génération Swagger (non bloquant) :', e.message);
+		}
+		// --- fin du nouveau ---
+
 		app.listen(port, () => {
 			console.log(`Server is running at http://localhost:${port}`);
 		});

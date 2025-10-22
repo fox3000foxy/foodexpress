@@ -1,3 +1,11 @@
+/* #swagger.tags = ['Middlewares'] */
+/* #swagger.parameters['Authorization'] = {
+     in: 'header',
+     description: "Bearer token",
+     required: true,
+     type: 'string'
+} */
+/* #swagger.responses[401] = { description: 'Token required or invalid' } */
 import jwt from 'jsonwebtoken';
 export default async function authMiddleware(req, res, next) {
     const token = req.headers['authorization']?.replace('Bearer ', '');

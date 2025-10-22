@@ -14,7 +14,12 @@ const menuItemSchema = new Schema({
 });
 const MenuItem = mongoose.model('MenuItem', menuItemSchema);
 const menuRouter = Router();
+/* #swagger.tags = ['Menus'] */
+/* #swagger.description = 'API pour les items de menu' */
 menuRouter.post('/', adminMiddleware, validate({ body: menuItemCreationSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = { in: 'header', description: 'Bearer admin token', required: true } */
+    /* #swagger.parameters['body'] = { in: 'body', description: 'Menu item payload' } */
+    /* #swagger.responses[201] = { description: 'Menu item created' } */
     const { restaurant_id, name, description, price, category } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     const newMenuItem = new MenuItem({ restaurant_id, name, description, price, category });
@@ -23,6 +28,7 @@ menuRouter.post('/', adminMiddleware, validate({ body: menuItemCreationSchema })
         .catch(err => res.status(400).json({ error: err.message }));
 });
 menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
+    /* #swagger.responses[200] = { description: 'Paged menu items' } */
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -99,6 +105,7 @@ menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
     }
 });
 menuRouter.get('/:id', validate({ params: menuItemIdSchema }), async (req, res) => {
+    /* #swagger.responses[200] = { description: 'Menu item object' } */
     const menuItemId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     MenuItem.findById(menuItemId)
@@ -151,6 +158,8 @@ menuRouter.get('/restaurant/:restaurantId', validate({ params: menuRestaurantIdS
     }
 });
 menuRouter.put('/:id', adminMiddleware, validate({ params: menuItemIdSchema, body: menuItemUpdateSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = { in: 'header', description: 'Bearer admin token', required: true } */
+    /* #swagger.parameters['body'] = { in: 'body', description: 'Menu item update payload' } */
     const menuItemId = req.params.id;
     const { restaurant_id, name, description, price, category } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
@@ -165,6 +174,8 @@ menuRouter.put('/:id', adminMiddleware, validate({ params: menuItemIdSchema, bod
         .catch(err => res.status(400).json({ error: err.message }));
 });
 menuRouter.delete('/:id', adminMiddleware, validate({ params: menuItemIdSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = { in: 'header', description: 'Bearer admin token', required: true } */
+    /* #swagger.responses[200] = { description: 'Menu item deleted' } */
     const menuItemId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     MenuItem.findByIdAndDelete(menuItemId)

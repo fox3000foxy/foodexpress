@@ -1,3 +1,5 @@
+/* #swagger.tags = ['Middlewares'] */
+/* #swagger.responses[400] = { description: 'Validation failed (bad body/query/params)' } */
 export function validate(options) {
     return (req, res, next) => {
         const errors = [];

@@ -13,7 +13,12 @@ const restaurantSchema = new Schema({
 });
 const Restaurant = mongoose.model('Restaurant', restaurantSchema);
 const restaurantRouter = Router();
+/* #swagger.tags = ['Restaurants'] */
+/* #swagger.description = 'CRUD restaurants' */
 restaurantRouter.post('/', adminMiddleware, validate({ body: restaurantCreationSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = { in: 'header', description: 'Bearer admin token', required: true } */
+    /* #swagger.parameters['body'] = { in: 'body', description: 'Restaurant payload' } */
+    /* #swagger.responses[201] = { description: 'Restaurant created' } */
     const { name, address, phone, opening_hours } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     const newRestaurant = new Restaurant({ name, address, phone, opening_hours });
@@ -22,6 +27,7 @@ restaurantRouter.post('/', adminMiddleware, validate({ body: restaurantCreationS
         .catch(err => res.status(400).json({ error: err.message }));
 });
 restaurantRouter.get('/', validate({ query: restaurantQuerySchema }), async (req, res) => {
+    /* #swagger.responses[200] = { description: 'Paged restaurants' } */
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
@@ -57,6 +63,7 @@ restaurantRouter.get('/', validate({ query: restaurantQuerySchema }), async (req
     }
 });
 restaurantRouter.get('/:id', validate({ params: restaurantIdSchema }), async (req, res) => {
+    /* #swagger.responses[200] = { description: 'Restaurant object' } */
     const restaurantId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     Restaurant.findById(restaurantId)
@@ -69,6 +76,8 @@ restaurantRouter.get('/:id', validate({ params: restaurantIdSchema }), async (re
         .catch(err => res.status(500).json({ error: err.message }));
 });
 restaurantRouter.put('/:id', adminMiddleware, validate({ params: restaurantIdSchema, body: restaurantUpdateSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = { in: 'header', description: 'Bearer admin token', required: true } */
+    /* #swagger.parameters['body'] = { in: 'body', description: 'Restaurant update payload' } */
     const restaurantId = req.params.id;
     const { name, address, phone, opening_hours } = req.body;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
@@ -82,6 +91,8 @@ restaurantRouter.put('/:id', adminMiddleware, validate({ params: restaurantIdSch
         .catch(err => res.status(400).json({ error: err.message }));
 });
 restaurantRouter.delete('/:id', adminMiddleware, validate({ params: restaurantIdSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = { in: 'header', description: 'Bearer admin token', required: true } */
+    /* #swagger.responses[200] = { description: 'Restaurant deleted' } */
     const restaurantId = req.params.id;
     await connect('mongodb://127.0.0.1:27017/foodexpress');
     Restaurant.findByIdAndDelete(restaurantId)

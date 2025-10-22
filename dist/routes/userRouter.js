@@ -7,6 +7,8 @@ import authMiddleware from '../middlewares/authMiddleware.js';
 import userAuthorizationMiddleware from '../middlewares/userAuthorizationMiddleware.js';
 import { validate } from '../middlewares/validationMiddleware.js';
 import { mongoIdSchema, paginationSchema, userLoginSchema, userRegistrationSchema, userUpdateSchema } from '../validation/userValidation.js';
+/* #swagger.tags = ['Users'] */
+/* #swagger.description = 'Gestion des utilisateurs (inscription, login, CRUD)' */
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
     username: { type: String, required: true, unique: true },
@@ -18,6 +20,12 @@ const userSchema = new Schema({
 const User = mongoose.model('User', userSchema);
 const userRouter = Router();
 userRouter.post('/', validate({ body: userRegistrationSchema }), async (req, res) => {
+    /* #swagger.parameters['body'] = {
+         in: 'body',
+         description: 'User registration payload',
+         schema: { email: 'user@example.com', username: 'user', password: 'pwd' }
+    } */
+    /* #swagger.responses[201] = { description: 'User created' } */
     const { email, username, password, role } = req.body;
     await connect('mongodb://localhost/foodexpress');
     try {
@@ -38,6 +46,12 @@ userRouter.post('/', validate({ body: userRegistrationSchema }), async (req, res
     }
 });
 userRouter.post('/login', validate({ body: userLoginSchema }), async (req, res) => {
+    /* #swagger.parameters['body'] = {
+         in: 'body',
+         description: 'Login payload',
+         schema: { email: 'user@example.com', password: 'pwd' }
+    } */
+    /* #swagger.responses[200] = { description: 'Returns user and token' } */
     const { email, password } = req.body;
     await connect('mongodb://localhost/foodexpress');
     try {
@@ -58,6 +72,7 @@ userRouter.post('/login', validate({ body: userLoginSchema }), async (req, res) 
     }
 });
 userRouter.get('/', validate({ query: paginationSchema }), async (req, res) => {
+    /* #swagger.responses[200] = { description: 'List of users (password excluded)' } */
     await connect('mongodb://localhost/foodexpress');
     try {
         const users = await User.find().select('-password');
@@ -68,6 +83,13 @@ userRouter.get('/', validate({ query: paginationSchema }), async (req, res) => {
     }
 });
 userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = {
+         in: 'header',
+         description: 'Bearer token',
+         required: true,
+         type: 'string'
+    } */
+    /* #swagger.responses[200] = { description: 'User object (password excluded)' } */
     const userId = req.params.id;
     await connect('mongodb://localhost/foodexpress');
     try {
@@ -82,6 +104,10 @@ userRouter.get('/:id', authMiddleware, userAuthorizationMiddleware, validate({ p
     }
 });
 userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema, body: userUpdateSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = {
+         in: 'header', description: 'Bearer token', required: true, type: 'string'
+    } */
+    /* #swagger.parameters['body'] = { in: 'body', description: 'Fields to update' } */
     const userId = req.params.id;
     const { email, username, password, role } = req.body;
     await connect('mongodb://localhost/foodexpress');
@@ -106,6 +132,10 @@ userRouter.put('/:id', authMiddleware, userAuthorizationMiddleware, validate({ p
     }
 });
 userRouter.delete('/:id', authMiddleware, userAuthorizationMiddleware, validate({ params: mongoIdSchema }), async (req, res) => {
+    /* #swagger.parameters['Authorization'] = {
+         in: 'header', description: 'Bearer token', required: true, type: 'string'
+    } */
+    /* #swagger.responses[200] = { description: 'User deleted' } */
     const userId = req.params.id;
     await connect('mongodb://localhost/foodexpress');
     try {
