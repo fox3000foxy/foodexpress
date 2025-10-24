@@ -19,6 +19,16 @@
     }
   },
   "paths": {
+    "/user": {
+      "get": {
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/users/": {
       "post": {
         "description": "",
@@ -31,29 +41,32 @@
           {
             "name": "body",
             "in": "body",
-            "description": "User registration payload",
             "schema": {
               "type": "object",
               "properties": {
                 "email": {
-                  "type": "string",
-                  "example": "user@example.com"
+                  "example": "any"
                 },
                 "username": {
-                  "type": "string",
-                  "example": "user"
+                  "example": "any"
                 },
                 "password": {
-                  "type": "string",
-                  "example": "pwd"
+                  "example": "any"
+                },
+                "role": {
+                  "example": "any"
+                },
+                "validate(req": {
+                  "example": "any"
                 }
               }
-            }
+            },
+            "description": "User registration payload"
           }
         ],
         "responses": {
           "201": {
-            "description": "User created"
+            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
@@ -94,25 +107,26 @@
           {
             "name": "body",
             "in": "body",
-            "description": "Login payload",
             "schema": {
               "type": "object",
               "properties": {
                 "email": {
-                  "type": "string",
-                  "example": "user@example.com"
+                  "example": "any"
                 },
                 "password": {
-                  "type": "string",
-                  "example": "pwd"
+                  "example": "any"
+                },
+                "validate(req": {
+                  "example": "any"
                 }
               }
-            }
+            },
+            "description": "Login payload"
           }
         ],
         "responses": {
           "200": {
-            "description": "Returns user and token"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -151,7 +165,7 @@
         ],
         "responses": {
           "200": {
-            "description": "User object (password excluded)"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -207,8 +221,7 @@
                   "example": "any"
                 }
               }
-            },
-            "description": "Fields to update"
+            }
           }
         ],
         "responses": {
@@ -259,7 +272,7 @@
         ],
         "responses": {
           "200": {
-            "description": "User deleted"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -311,13 +324,12 @@
                   "example": "any"
                 }
               }
-            },
-            "description": "Restaurant payload"
+            }
           }
         ],
         "responses": {
           "201": {
-            "description": "Restaurant created"
+            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
@@ -424,24 +436,11 @@
             "schema": {
               "type": "object",
               "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "address": {
-                  "example": "any"
-                },
-                "phone": {
-                  "example": "any"
-                },
-                "opening_hours": {
-                  "example": "any"
-                },
                 "validate(req": {
                   "example": "any"
                 }
               }
-            },
-            "description": "Restaurant update payload"
+            }
           }
         ],
         "responses": {
@@ -492,7 +491,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Restaurant deleted"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -528,32 +527,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "restaurant_id": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                },
-                "category": {
-                  "example": "any"
-                },
                 "validate(req": {
                   "example": "any"
                 }
               }
-            },
-            "description": "Menu item payload"
+            }
           }
         ],
         "responses": {
           "201": {
-            "description": "Menu item created"
+            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
@@ -660,27 +643,11 @@
             "schema": {
               "type": "object",
               "properties": {
-                "restaurant_id": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                },
-                "category": {
-                  "example": "any"
-                },
                 "validate(req": {
                   "example": "any"
                 }
               }
-            },
-            "description": "Menu item update payload"
+            }
           }
         ],
         "responses": {
@@ -731,7 +698,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Menu item deleted"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -762,16 +729,6 @@
           },
           {
             "name": "limit",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "sortOrder",
             "in": "query",
             "type": "string"
           },
@@ -816,32 +773,16 @@
             "schema": {
               "type": "object",
               "properties": {
-                "restaurant_id": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                },
-                "category": {
-                  "example": "any"
-                },
                 "validate(req": {
                   "example": "any"
                 }
               }
-            },
-            "description": "Menu item payload"
+            }
           }
         ],
         "responses": {
           "201": {
-            "description": "Menu item created"
+            "description": "Created"
           },
           "400": {
             "description": "Bad Request"
@@ -902,25 +843,26 @@
           {
             "name": "body",
             "in": "body",
-            "description": "Login payload",
             "schema": {
               "type": "object",
               "properties": {
                 "email": {
-                  "type": "string",
-                  "example": "user@example.com"
+                  "example": "any"
                 },
                 "password": {
-                  "type": "string",
-                  "example": "pwd"
+                  "example": "any"
+                },
+                "validate(req": {
+                  "example": "any"
                 }
               }
-            }
+            },
+            "description": "Login payload"
           }
         ],
         "responses": {
           "200": {
-            "description": "Returns user and token"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -992,27 +934,11 @@
             "schema": {
               "type": "object",
               "properties": {
-                "restaurant_id": {
-                  "example": "any"
-                },
-                "name": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                },
-                "category": {
-                  "example": "any"
-                },
                 "validate(req": {
                   "example": "any"
                 }
               }
-            },
-            "description": "Menu item update payload"
+            }
           }
         ],
         "responses": {
@@ -1063,7 +989,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Menu item deleted"
+            "description": "OK"
           },
           "400": {
             "description": "Bad Request"
@@ -1094,16 +1020,6 @@
           },
           {
             "name": "limit",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "sortBy",
-            "in": "query",
-            "type": "string"
-          },
-          {
-            "name": "sortOrder",
             "in": "query",
             "type": "string"
           },

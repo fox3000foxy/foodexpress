@@ -13,12 +13,17 @@ import restaurantRouter from './routes/restaurantRouter.js';
 import userRouter from './routes/userRouter.js';
 
 app.use(express.json());
-app.use('/users', userRouter);
-app.use('/restaurants', restaurantRouter);
-app.use('/menus', menuRouter);
 
-// Remplacement : connecter une seule fois avant de démarrer le serveur
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost/foodexpress';
+// ajouter une route courte pour supporter /user (redirection vers /users)
+app.get('/user', (req, res) => {
+	// redirige vers la route normale /users
+	res.redirect(301, '/users');
+});
+
+// --- Nouveau : connexion simple via MONGO_URI (dotenv) ---
+// Utilisez export MONGO_URI="mongodb://<HOST>:27017/foodexpress" si nécessaire
+const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/foodexpress';
+
 mongoose.connect(mongoUri)
 	.then(async () => {
 		console.log('Connected to MongoDB:', mongoUri);
@@ -35,17 +40,13 @@ mongoose.connect(mongoUri)
 				path.resolve(process.cwd(), 'routes', 'userRouter.js'),
 				path.resolve(process.cwd(), 'routes', 'restaurantRouter.js'),
 				path.resolve(process.cwd(), 'routes', 'menuRouter.js'),
-				// ajouter les middlewares pour que swagger-autogen collecte leurs commentaires
 				path.resolve(process.cwd(), 'middlewares', 'authMiddleware.js'),
 				path.resolve(process.cwd(), 'middlewares', 'adminMiddleware.js'),
 				path.resolve(process.cwd(), 'middlewares', 'validationMiddleware.js')
 			];
 
 			const doc = {
-				info: {
-					title: 'API FoodExpress',
-					description: 'Documentation auto-générée'
-				},
+				info: { title: 'API FoodExpress', description: 'Documentation auto-générée' },
 				host: `localhost:${process.env.PORT || 3000}`,
 				schemes: ['http'],
 				// sécurité : header Authorization Bearer
@@ -80,11 +81,13 @@ mongoose.connect(mongoUri)
 		} catch (e) {
 			console.warn('Erreur lors de la génération Swagger (non bloquant) :', e.message);
 		}
-		// --- fin du nouveau ---
 
-		app.listen(port, () => {
-			console.log(`Server is running at http://localhost:${port}`);
-		});
+		// Monter les routes (si pas déjà montées plus haut) — les imports existent en haut
+		app.use('/users', userRouter);
+		app.use('/restaurants', restaurantRouter);
+		app.use('/menus', menuRouter);
+
+		app.listen(port, () => console.log(`Serveur sur http://localhost:${port}`));
 	})
 	.catch((err) => {
 		console.error('MongoDB connection error:', err);
