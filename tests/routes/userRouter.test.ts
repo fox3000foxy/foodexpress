@@ -1,8 +1,7 @@
-import request from 'supertest';
-import express from 'express';
-import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
+import express from 'express';
 import jwt from 'jsonwebtoken';
+import request from 'supertest';
 import User from '../../src/models/userModel';
 import userRouter from '../../src/routes/userRouter';
 
@@ -16,7 +15,6 @@ describe('User Router', () => {
   let userId: string;
 
   beforeEach(async () => {
-    // Create test users
     const hashedPassword = await bcrypt.hash('password123', 10);
 
     const adminUser = new User({
@@ -36,7 +34,6 @@ describe('User Router', () => {
     const savedUser = await regularUser.save();
     userId = savedUser._id.toString();
 
-    // Generate tokens
     adminToken = jwt.sign({ userId: adminUser._id.toString(), role: 'admin' }, 'test_secret');
     userToken = jwt.sign({ userId: userId, role: 'user' }, 'test_secret');
   });

@@ -1,5 +1,5 @@
+import { Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { Request, Response } from 'express';
 import adminMiddleware, { AuthenticatedRequest } from '../../src/middlewares/adminMiddleware';
 
 describe('Admin Middleware', () => {

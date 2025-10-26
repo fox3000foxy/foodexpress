@@ -1,10 +1,9 @@
 
 import { Router } from 'express';
-import mongoose, { connect } from 'mongoose';
 import adminMiddleware from '../middlewares/adminMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
-import { restaurantCreationSchema, restaurantIdSchema, restaurantQuerySchema, restaurantUpdateSchema } from '../validation/restaurantValidation';
 import Restaurant from '../models/restaurantModel';
+import { restaurantCreationSchema, restaurantIdSchema, restaurantQuerySchema, restaurantUpdateSchema } from '../validation/restaurantValidation';
 
 const restaurantRouter = Router();
 

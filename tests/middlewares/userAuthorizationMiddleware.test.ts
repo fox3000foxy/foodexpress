@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthenticatedRequest } from '../../src/middlewares/authMiddleware';
 import userAuthorizationMiddleware from '../../src/middlewares/userAuthorizationMiddleware';
 

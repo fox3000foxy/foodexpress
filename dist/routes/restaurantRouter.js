@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import adminMiddleware from '../middlewares/adminMiddleware.js';
-import { validate } from '../middlewares/validationMiddleware.js';
-import { restaurantCreationSchema, restaurantIdSchema, restaurantQuerySchema, restaurantUpdateSchema } from '../validation/restaurantValidation.js';
-import Restaurant from '../models/restaurantModel.js';
+import adminMiddleware from '../middlewares/adminMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import Restaurant from '../models/restaurantModel';
+import { restaurantCreationSchema, restaurantIdSchema, restaurantQuerySchema, restaurantUpdateSchema } from '../validation/restaurantValidation';
 const restaurantRouter = Router();
 /**
  * @swagger

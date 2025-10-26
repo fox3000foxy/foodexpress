@@ -1,7 +1,6 @@
-import request from 'supertest';
 import express from 'express';
-import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
+import request from 'supertest';
 import Restaurant from '../../src/models/restaurantModel';
 import restaurantRouter from '../../src/routes/restaurantRouter';
 
@@ -14,10 +13,8 @@ describe('Restaurant Router', () => {
   let restaurantId: string;
 
   beforeEach(async () => {
-    // Create admin user for token
     adminToken = jwt.sign({ userId: 'admin123', role: 'admin' }, 'test_secret');
 
-    // Create test restaurant
     const restaurant = new Restaurant({
       name: 'Test Restaurant',
       address: '123 Test Street, Test City',

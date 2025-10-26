@@ -1,9 +1,8 @@
-import request from 'supertest';
 import express from 'express';
-import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import Restaurant from '../../src/models/restaurantModel';
+import request from 'supertest';
 import MenuItem from '../../src/models/menuItemModel';
+import Restaurant from '../../src/models/restaurantModel';
 import menuRouter from '../../src/routes/menuRouter';
 
 const app = express();
@@ -16,10 +15,8 @@ describe('Menu Router', () => {
   let menuItemId: string;
 
   beforeEach(async () => {
-    // Create admin user for token
     adminToken = jwt.sign({ userId: 'admin123', role: 'admin' }, 'test_secret');
 
-    // Create test restaurant
     const restaurant = new Restaurant({
       name: 'Test Restaurant',
       address: '123 Test Street, Test City',
@@ -29,7 +26,6 @@ describe('Menu Router', () => {
     const savedRestaurant = await restaurant.save();
     restaurantId = savedRestaurant._id.toString();
 
-    // Create test menu item
     const menuItem = new MenuItem({
       restaurant_id: restaurantId,
       name: 'Test Dish',

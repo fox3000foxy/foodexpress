@@ -1,10 +1,8 @@
-import mongoose from 'mongoose';
 import { initializeDatabase } from '../src/database';
 import User from '../src/models/userModel';
 
 describe('Database Initialization', () => {
   it('should initialize database if not seeded', async () => {
-    // Mock User.countDocuments to return 0 (not seeded)
     jest.spyOn(User, 'countDocuments').mockResolvedValue(0);
 
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation();

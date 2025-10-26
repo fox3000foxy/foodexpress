@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import Restaurant from '../../src/models/restaurantModel';
 import MenuItem from '../../src/models/menuItemModel';
+import Restaurant from '../../src/models/restaurantModel';
 
 describe('MenuItem Model', () => {
   let restaurantId: mongoose.Types.ObjectId;

@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema({
     role: { type: String, enum: ['user', 'admin'], default: 'user' }
 }, { timestamps: true });
 
-// troisième param = nom exact de la collection (force 'user' si Compass l'utilise)
 const User = mongoose.models.User || mongoose.model('User', userSchema, 'user');
 
 export default User;

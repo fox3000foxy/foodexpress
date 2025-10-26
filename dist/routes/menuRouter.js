@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import adminMiddleware from '../middlewares/adminMiddleware.js';
-import { validate } from '../middlewares/validationMiddleware.js';
-import { menuItemCreationSchema, menuItemIdSchema, menuItemUpdateSchema, menuQuerySchema, menuRestaurantIdSchema } from '../validation/menuValidation.js';
-import MenuItem from '../models/menuItemModel.js';
+import adminMiddleware from '../middlewares/adminMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import MenuItem from '../models/menuItemModel';
+import { menuItemCreationSchema, menuItemIdSchema, menuItemUpdateSchema, menuQuerySchema, menuRestaurantIdSchema } from '../validation/menuValidation';
 const menuRouter = Router();
 /**
  * @swagger

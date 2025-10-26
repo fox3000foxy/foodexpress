@@ -1,23 +1,17 @@
 import swaggerAutogen from 'swagger-autogen';
-import {fileURLToPath} from 'url';
-import path from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const outputFile = path.join(process.cwd(), 'swagger_output.json');
+const outputFile = './dist/swagger_output.json';
 const endpointsFiles = [
-    path.join(__dirname, 'routes/userRouter.js'),
-    path.join(__dirname, 'routes/restaurantRouter.js'),
-    path.join(__dirname, 'routes/menuRouter.js'),
-    path.join(__dirname, 'middlewares/adminMiddleware.js'),
-    path.join(__dirname, 'middlewares/authMiddleware.js'),
-    path.join(__dirname, 'middlewares/userAuthorizationMiddleware.js'),
-    path.join(__dirname, 'middlewares/validationMiddleware.js'),
-    path.join(__dirname, 'index.js'),
-    path.join(__dirname, 'validation/menuValidation.js'),
-    path.join(__dirname, 'validation/restaurantValidation.js'),
-    path.join(__dirname, 'validation/userValidation.js')
+    './src/routes/userRouter.ts',
+    './src/routes/restaurantRouter.ts',
+    './src/routes/menuRouter.ts',
+    './src/middlewares/adminMiddleware.ts',
+    './src/middlewares/authMiddleware.ts',
+    './src/middlewares/userAuthorizationMiddleware.ts',
+    './src/middlewares/validationMiddleware.ts',
+    './src/index.ts',
+    './src/validation/menuValidation.ts',
+    './src/validation/restaurantValidation.ts',
+    './src/validation/userValidation.ts'
 ];
 const doc = {
     info: {

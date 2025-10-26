@@ -8,7 +8,6 @@ beforeAll(async () => {
   const mongoUri = mongoServer.getUri();
   await mongoose.connect(mongoUri);
 
-  // Set test environment variables
   process.env.JWT_SECRET = 'test_secret';
   process.env.MONGO_URI = mongoUri;
 });

@@ -1,12 +1,12 @@
 import bcrypt from 'bcrypt';
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
-import adminMiddleware from '../middlewares/adminMiddleware.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
-import userAuthorizationMiddleware from '../middlewares/userAuthorizationMiddleware.js';
-import { validate } from '../middlewares/validationMiddleware.js';
-import { mongoIdSchema, paginationSchema, userLoginSchema, userRegistrationSchema, userUpdateSchema } from '../validation/userValidation.js';
-import User from '../models/userModel.js';
+import adminMiddleware from '../middlewares/adminMiddleware';
+import authMiddleware from '../middlewares/authMiddleware';
+import userAuthorizationMiddleware from '../middlewares/userAuthorizationMiddleware';
+import { validate } from '../middlewares/validationMiddleware';
+import User from '../models/userModel';
+import { mongoIdSchema, paginationSchema, userLoginSchema, userRegistrationSchema, userUpdateSchema } from '../validation/userValidation';
 const userRouter = Router();
 /**
  * @swagger

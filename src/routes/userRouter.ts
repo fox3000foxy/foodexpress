@@ -2,19 +2,12 @@
 import bcrypt from 'bcrypt';
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
-import mongoose, { connect } from 'mongoose';
 import adminMiddleware, { AuthenticatedRequest } from '../middlewares/adminMiddleware';
 import authMiddleware from '../middlewares/authMiddleware';
 import userAuthorizationMiddleware from '../middlewares/userAuthorizationMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
-import {
-    mongoIdSchema,
-    paginationSchema,
-    userLoginSchema,
-    userRegistrationSchema,
-    userUpdateSchema
-} from '../validation/userValidation';
 import User from '../models/userModel';
+import { mongoIdSchema, paginationSchema, userLoginSchema, userRegistrationSchema, userUpdateSchema } from '../validation/userValidation';
 
 const userRouter = Router();
 

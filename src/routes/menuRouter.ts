@@ -1,8 +1,8 @@
 
 import { Router } from 'express';
-import mongoose, { connect } from 'mongoose';
 import adminMiddleware from '../middlewares/adminMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
+import MenuItem from '../models/menuItemModel';
 import {
   menuItemCreationSchema,
   menuItemIdSchema,
@@ -10,7 +10,6 @@ import {
   menuQuerySchema,
   menuRestaurantIdSchema
 } from '../validation/menuValidation';
-import MenuItem from '../models/menuItemModel';
 
 const menuRouter = Router();
 

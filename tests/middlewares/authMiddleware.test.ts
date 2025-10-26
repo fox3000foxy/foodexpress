@@ -1,5 +1,5 @@
+import { Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { Request, Response } from 'express';
 import authMiddleware, { AuthenticatedRequest } from '../../src/middlewares/authMiddleware';
 
 describe('Auth Middleware', () => {
