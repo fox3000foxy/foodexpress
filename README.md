@@ -318,7 +318,27 @@ Authorization: Bearer <admin-jwt-token>
    node index.js
    ```
 
+## Testing
+
+The project includes comprehensive tests using Jest and Supertest for API testing.
+
+### Running Tests
+
+- **Run all tests**: `npm test`
+- **Run tests in watch mode** (automatically re-run on file changes): `npm run test:watch`
+- **Run tests with coverage report**: `npm run test:coverage`
+
+### Test Structure
+
+Tests are organized in the `tests/` directory with the following structure:
+- `models/`: Tests for data models (User, Restaurant, MenuItem)
+- `middlewares/`: Tests for authentication, authorization, and validation middlewares
+- `routes/`: Tests for API route handlers
+- `database.test.ts`: Database connection tests
+- `setup.ts`: Test configuration and setup
+
+
 ## Database
 
 - MongoDB connection: `mongodb://127.0.0.1:27017/foodexpress`
-- Collections: `users`, `restaurants`, `menuitems`
+- Collections: `user`, `restaurants`, `menus`
