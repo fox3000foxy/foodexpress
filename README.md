@@ -51,7 +51,7 @@ All API endpoints include comprehensive input validation using Joi:
 
 ## API Endpoints
 
-### User Management
+### User Management ###
 
 #### Register User (Public)
 ```
@@ -120,7 +120,7 @@ DELETE /users/:id                      // ID must be valid MongoDB ObjectId
 Authorization: Bearer <jwt-token>
 ```
 
-### Restaurant Management
+### Restaurant Management ###
 
 #### Get All Restaurants (Public)
 ```
@@ -166,7 +166,7 @@ DELETE /restaurants/:id
 Authorization: Bearer <admin-jwt-token>
 ```
 
-### Menu Management
+### Menu Management ###
 
 #### Get All Menu Items (Public)
 ```
@@ -221,7 +221,7 @@ DELETE /menus/:id
 Authorization: Bearer <admin-jwt-token>
 ```
 
-## Security Features
+## Security Features ###
 
 1. **Password Hashing**: All passwords are hashed using bcrypt with 10 salt rounds
 2. **JWT Authentication**: Stateless authentication with 24-hour token expiration
@@ -300,17 +300,22 @@ Authorization: Bearer <admin-jwt-token>
 
 2. Set up environment variables in `.env`:
    ```
-   JWT_SECRET=your-super-secret-jwt-key
+   JWT_SECRET=supersecretjwtkey
    ```
 
 3. Start development server:
    ```bash
-   npm run dev
+   npm run dev OR npm run dev:tsx
    ```
 
 4. Build for production:
    ```bash
    npm run build
+   ```
+
+5. Run sever from './dist'
+   ```bash
+   node index.js
    ```
 
 ## Database
