@@ -1,6 +1,6 @@
 
 import { Router } from 'express';
-import mongoose, { connect, Schema } from 'mongoose';
+import mongoose, { connect } from 'mongoose';
 import adminMiddleware from '../middlewares/adminMiddleware';
 import { validate } from '../middlewares/validationMiddleware';
 import {
@@ -10,47 +10,87 @@ import {
   menuQuerySchema,
   menuRestaurantIdSchema
 } from '../validation/menuValidation';
-
-const menuItemSchema = new Schema({
-  restaurant_id: { type: Schema.Types.ObjectId, ref: 'Restaurant', required: true },
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  price: { type: Number, required: true },
-  category: { type: String, required: true }
-}, {
-  timestamps: true
-});
-
-const MenuItem = mongoose.model('MenuItem', menuItemSchema);
+import MenuItem from '../models/menuItemModel';
 
 const menuRouter = Router();
 
+/**
+ * @swagger
+ * /menus:
+ *   post:
+ *     summary: Create a new menu item (admin only)
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/MenuItem'
+ *     responses:
+ *       201:
+ *         description: Menu item created successfully
+ *       400:
+ *         description: Bad Request
+ */
+
 menuRouter.post('/', adminMiddleware, validate({ body: menuItemCreationSchema }), async (req, res) => {
   const { restaurant_id, name, description, price, category } = req.body;
-  await connect('mongodb://127.0.0.1:27017/foodexpress');
 
   const newMenuItem = new MenuItem({ restaurant_id, name, description, price, category });
   newMenuItem.save()
-    .then(menuItem => res.status(201).json(menuItem))
-    .catch(err => res.status(400).json({ error: err.message }));
+    .then((menuItem: any) => res.status(201).json(menuItem))
+    .catch((err: any) => res.status(400).json({ error: err.message }));
 });
 
-menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
-  await connect('mongodb://127.0.0.1:27017/foodexpress');
+/**
+ * @swagger
+ * /menus:
+ *   get:
+ *     summary: Get all menu items with pagination
+ *     tags: [Menus]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Paged menu items
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
+ */
 
-  
+menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
+
+
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
-  const sortBy = req.query.sortBy as string; 
-  const sortOrder = req.query.sortOrder as string || 'asc'; 
+  const sortBy = req.query.sortBy as string;
+  const sortOrder = req.query.sortOrder as string || 'asc';
 
-  
+
   const skip = (page - 1) * limit;
 
   try {
     let query = MenuItem.find().populate('restaurant_id', 'name address');
 
-    
+
     if (sortBy === 'name') {
       query = query.sort({ name: sortOrder === 'desc' ? -1 : 1 });
     } else if (sortBy === 'price') {
@@ -58,7 +98,7 @@ menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
     } else if (sortBy === 'category') {
       query = query.sort({ category: sortOrder === 'desc' ? -1 : 1 });
     } else if (sortBy === 'address') {
-      
+
       const sortDirection = sortOrder === 'desc' ? -1 : 1;
       const menuItems = await MenuItem.aggregate([
         {
@@ -99,7 +139,7 @@ menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
       });
     }
 
-    
+
     query = query.skip(skip).limit(limit);
 
     const menuItems = await query.exec();
@@ -122,9 +162,31 @@ menuRouter.get('/', validate({ query: menuQuerySchema }), async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /menus/{id}:
+ *   get:
+ *     summary: Get a menu item by ID
+ *     tags: [Menus]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Menu item object
+ *       400:
+ *         description: Bad Request
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Internal Server Error
+ */
+
 menuRouter.get('/:id', validate({ params: menuItemIdSchema }), async (req, res) => {
   const menuItemId = req.params.id;
-  await connect('mongodb://127.0.0.1:27017/foodexpress');
 
   MenuItem.findById(menuItemId)
     .populate('restaurant_id', 'name')
@@ -137,23 +199,59 @@ menuRouter.get('/:id', validate({ params: menuItemIdSchema }), async (req, res) 
     .catch(err => res.status(500).json({ error: err.message }));
 });
 
+/**
+ * @swagger
+ * /menus/restaurant/{restaurantId}:
+ *   get:
+ *     summary: Get menu items by restaurant ID
+ *     tags: [Menus]
+ *     parameters:
+ *       - in: path
+ *         name: restaurantId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: sortOrder
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Menu items for the restaurant
+ *       400:
+ *         description: Bad Request
+ *       500:
+ *         description: Internal Server Error
+ */
+
 menuRouter.get('/restaurant/:restaurantId', validate({ params: menuRestaurantIdSchema, query: menuQuerySchema }), async (req, res) => {
   const restaurantId = req.params.restaurantId;
-  await connect('mongodb://127.0.0.1:27017/foodexpress');
 
-  
+
   const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
-  const sortBy = req.query.sortBy as string; 
-  const sortOrder = req.query.sortOrder as string || 'asc'; 
+  const sortBy = req.query.sortBy as string;
+  const sortOrder = req.query.sortOrder as string || 'asc';
 
-  
+
   const skip = (page - 1) * limit;
 
   try {
     let query = MenuItem.find({ restaurant_id: restaurantId }).populate('restaurant_id', 'name address');
 
-    
+
     if (sortBy === 'name') {
       query = query.sort({ name: sortOrder === 'desc' ? -1 : 1 });
     } else if (sortBy === 'price') {
@@ -162,7 +260,7 @@ menuRouter.get('/restaurant/:restaurantId', validate({ params: menuRestaurantIdS
       query = query.sort({ category: sortOrder === 'desc' ? -1 : 1 });
     }
 
-    
+
     query = query.skip(skip).limit(limit);
 
     const menuItems = await query.exec();
@@ -185,10 +283,38 @@ menuRouter.get('/restaurant/:restaurantId', validate({ params: menuRestaurantIdS
   }
 });
 
+/**
+ * @swagger
+ * /menus/{id}:
+ *   put:
+ *     summary: Update a menu item by ID (admin only)
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/MenuItem'
+ *     responses:
+ *       200:
+ *         description: Menu item updated successfully
+ *       400:
+ *         description: Bad Request
+ *       404:
+ *         description: Not Found
+ */
+
 menuRouter.put('/:id', adminMiddleware, validate({ params: menuItemIdSchema, body: menuItemUpdateSchema }), async (req, res) => {
   const menuItemId = req.params.id;
   const { restaurant_id, name, description, price, category } = req.body;
-  await connect('mongodb://127.0.0.1:27017/foodexpress');
 
   MenuItem.findByIdAndUpdate(menuItemId, { restaurant_id, name, description, price, category }, { new: true })
     .populate('restaurant_id', 'name')
@@ -201,9 +327,33 @@ menuRouter.put('/:id', adminMiddleware, validate({ params: menuItemIdSchema, bod
     .catch(err => res.status(400).json({ error: err.message }));
 });
 
+/**
+ * @swagger
+ * /menus/{id}:
+ *   delete:
+ *     summary: Delete a menu item by ID (admin only)
+ *     tags: [Menus]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Menu item deleted successfully
+ *       400:
+ *         description: Bad Request
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Internal Server Error
+ */
+
 menuRouter.delete('/:id', adminMiddleware, validate({ params: menuItemIdSchema }), async (req, res) => {
   const menuItemId = req.params.id;
-  await connect('mongodb://127.0.0.1:27017/foodexpress');
 
   MenuItem.findByIdAndDelete(menuItemId)
     .then(menuItem => {

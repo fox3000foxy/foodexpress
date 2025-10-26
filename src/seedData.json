@@ -1,0 +1,86 @@
+{
+  "users": [
+    {
+      "email": "admin@example.com",
+      "username": "admin",
+      "password": "$2b$10$DU4F/HDbRSH8NcedPMlfJ.kJcp62lDUn05NEeCIYM/JCAekfIvt4i",
+      "role": "admin"
+    },
+    {
+      "email": "user1@example.com",
+      "username": "user1",
+      "password": "$2b$10$exampleHashedPasswordForUser1",
+      "role": "user"
+    },
+    {
+      "email": "user2@example.com",
+      "username": "user2",
+      "password": "$2b$10$exampleHashedPasswordForUser2",
+      "role": "user"
+    }
+  ],
+  "restaurants": [
+    {
+      "name": "Pizza Palace",
+      "address": "123 rue Dupont",
+      "phone": "+1234567890",
+      "opening_hours": "10:00-22:00"
+    },
+    {
+      "name": "Big Burger",
+      "address": "321 impasse des pissenlits",
+      "phone": "+0987654321",
+      "opening_hours": "11:00-23:00"
+    },
+    {
+      "name": "Sushi Spot",
+      "address": "01 avenue Tokyo",
+      "phone": "+1122334455",
+      "opening_hours": "12:00-21:00"
+    }
+  ],
+  "menus": [
+    {
+      "restaurant_name": "Pizza Palace",
+      "name": "Margherita",
+      "description": "Pizza classique avec sauce tomate, mozzarella et basilic",
+      "price": 12.99,
+      "category": "Pizza"
+    },
+    {
+      "restaurant_name": "Pizza Palace",
+      "name": "Pepperoni",
+      "description": "Pizza avec pepperoni et fromage",
+      "price": 14.99,
+      "category": "Pizza"
+    },
+    {
+      "restaurant_name": "Big Burger",
+      "name": "Classic Burger",
+      "description": "Burger au bœuf juteux avec laitue, tomate et fromage",
+      "price": 9.99,
+      "category": "Burger"
+    },
+    {
+      "restaurant_name": "Big Burger",
+      "name": "Veggie Burger",
+      "description": "Burger à base de plantes avec légumes et sauce",
+      "price": 8.99,
+      "category": "Burger"
+    },
+    {
+      "restaurant_name": "Sushi Spot",
+      "name": "California Roll",
+      "description": "Sushi roll avec crabe, avocat et concombre",
+      "price": 11.99,
+      "category": "Sushi"
+    },
+    {
+      "restaurant_name": "Sushi Spot",
+      "name": "Salmon Nigiri",
+      "description": "Saumon frais sur du riz",
+      "price": 13.99,
+      "category": "Sushi"
+    }
+  ]
+}
