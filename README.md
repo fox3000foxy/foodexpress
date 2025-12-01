@@ -342,3 +342,34 @@ Tests are organized in the `tests/` directory with the following structure:
 
 - MongoDB connection: `mongodb://127.0.0.1:27017/foodexpress`
 - Collections: `user`, `restaurants`, `menus`
+
+## Docker
+
+Run the application with Docker and Docker Compose.
+
+- Build and run with Compose (production image):
+
+```powershell
+docker-compose up --build
+```
+
+- Run in background:
+
+```powershell
+docker-compose up -d --build
+```
+
+- Stop and remove containers:
+
+```powershell
+docker-compose down
+```
+
+The compose setup includes a `mongo` service and the `app` service. The app is configured with `MONGO_URI=mongodb://mongo:27017/foodexpress` and exposes port `3000`.
+
+If you prefer to build the image manually:
+
+```powershell
+docker build -t foodexpress:latest .
+docker run -e MONGO_URI="mongodb://host.docker.internal:27017/foodexpress" -p 3000:3000 foodexpress:latest
+```
